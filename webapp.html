@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Irrigation System</title>
+        
+    <style>    
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1 {
+            color: #80deea;
+        }
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background-color: #1e1e1e;
+        }
+        .status {
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .status.on {
+            background-color: #0a3d0a;
+            color: #4CAF50;
+        }
+        .status.off {
+            background-color: #3d0a0a;
+            color: #f44336;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        button {
+            padding: 15px 40px;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .on-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .off-btn {
+            background-color: #f44336;
+            color: white;
+        }
+        .on-btn:hover {
+            background-color: #45a049;
+        }
+        .off-btn:hover {
+            background-color: #d32f2f;
+        }
+        .smart-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        .smart-btn:hover {
+            background-color: #0b7dda;
+        }
+        .settings {
+            margin-top: 40px;
+            text-align: left;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background-color: #1e1e1e;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 8px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #2c2c2c;
+            color: #e0e0e0;
+        }
+        input[type="text"] {
+            width: 250px;
+        }
+        input[type="number"] {
+            width: 60px;
+        }
+        .save-btn {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 20px;
+        }
+        .save-btn:hover {
+            background-color: #0b7dda;
+        }
+        .connection-status {
+            margin-top: 10px;
+            font-style: italic;
+            color: #aaa;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .sensor-card {
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            background-color: #252525;
+        }
+        .sensor-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #90caf9;
+        }
+        .sensor-label {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .meter-container {
+            height: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .meter-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+        .moisture-fill {
+            background-color: #2196F3;
+        }
+        .flow-fill {
+            background-color: #4CAF50;
+        }
+        .refresh-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .auto-refresh {
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .last-updated {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 10px;
+        }
+        .schedule-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .schedule-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .schedule-status {
+            margin-top: 10px;
+            font-style: italic;
+            color: #aaa;
+        }
+        .schedule-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        /* Weather section styles */
+        .weather-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .weather-card {
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            background-color: #252525;
+        }
+        .weather-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 8px 0;
+            color: #ff9800;
+        }
+        .weather-label {
+            color: #aaa;
+            font-size: 14px;
+        }
+        .weather-icon {
+            font-size: 28px;
+            margin: 5px 0;
+        }
+        .forecast-day {
+            font-weight: bold;
+            color: #80deea;
+            margin-bottom: 5px;
+        }
+        #smartModeStatus {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .smart-active {
+            background-color: #0a3d3d;
+            color: #00BCD4;
+        }
+        .smart-inactive {
+            background-color: #333;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <h1>Smart Irrigation System</h1>
+    
+    <div class="section">
+        <h2>Pump Control</h2>
+        <div id="status" class="status off">Pump Status: OFF</div>
+        
+        <div class="button-container">
+            <button id="onButton" class="on-btn">Turn ON</button>
+            <button id="offButton" class="off-btn">Turn OFF</button>
+            <button id="smartButton" class="smart-btn">Smart Mode</button>
+        </div>
+        
+        <div id="smartModeStatus" class="smart-inactive">Smart Mode: Inactive</div>
+        
+        <!-- Simple Schedule Controls -->
+        <div class="schedule-form">
+            <h3>Watering Schedule</h3>
+            
+            <div class="schedule-row">
+                <label for="scheduleInterval">Water every:</label>
+                <input type="number" id="scheduleInterval" min="1" max="72" value="1">
+                <span style="margin: 0 10px;">hours</span>
+                
+                <label for="scheduleDuration">for:</label>
+                <input type="number" id="scheduleDuration" min="1" max="60" value="5">
+                <span style="margin: 0 10px;">minutes</span>
+            </div>
+            
+            <div class="schedule-buttons">
+                <button id="startSchedule" class="on-btn">Start Scheduling</button>
+                <button id="stopSchedule" class="off-btn">Stop Scheduling</button>
+            </div>
+            
+            <div id="scheduleStatus" class="schedule-status"></div>
+        </div>
+    </div>
+    
+    <!-- New Weather Section -->
+    <div class="section">
+        <h2>Weather Forecast</h2>
+        <div class="weather-grid" id="weatherDisplay">
+            <!-- Weather data will be inserted here dynamically -->
+            <div class="weather-card">
+                <div class="weather-label">Loading weather data...</div>
+            </div>
+        </div>
+        <div id="weatherStatus" class="connection-status">Weather data not loaded</div>
+    </div>
+    
+    <div class="section">
+        <h2>Sensor Readings</h2>
+        
+        <div class="sensor-grid">
+            <div class="sensor-card">
+                <div class="sensor-label">Soil Moisture</div>
+                <div id="moistureValue" class="sensor-value">--</div>
+                <div class="meter-container">
+                    <div id="moistureFill" class="meter-fill moisture-fill" style="width: 0%"></div>
+                </div>
+                <div class="sensor-label">0% (Dry) to 100% (Wet)</div>
+            </div>
+            
+            <div class="sensor-card">
+                <div class="sensor-label">Water Flow Rate</div>
+                <div id="flowRateValue" class="sensor-value">--</div>
+                <div class="meter-container">
+                    <div id="flowFill" class="meter-fill flow-fill" style="width: 0%"></div>
+                </div>
+                <div class="sensor-label">Liters per Minute (L/min)</div>
+            </div>
+            
+            <div class="sensor-card">
+                <div class="sensor-label">Total Water Used</div>
+                <div id="totalWaterValue" class="sensor-value">--</div>
+                <div class="sensor-label">Liters (L)</div>
+            </div>
+            
+            <div class="sensor-card">
+                <div class="sensor-label">System Status</div>
+                <div id="systemStatus" class="sensor-value">--</div>
+                <div id="connectionStatus" class="connection-status">Not connected to Arduino</div>
+                <div id="errorMessage" class="error"></div>
+            </div>
+        </div>
+        
+        <div class="refresh-container">
+            <button id="refreshData" class="save-btn">Refresh Data</button>
+            <div class="auto-refresh">
+                <input type="checkbox" id="autoRefresh">
+                <label for="autoRefresh">Auto-refresh (5s)</label>
+            </div>
+        </div>
+        
+        <div id="lastUpdated" class="last-updated"></div>
+    </div>
+    
+    <div class="settings">
+        <h2>Settings</h2>
+        <div class="form-group">
+            <label for="arduinoIp">Arduino IP:</label>
+            <input type="text" id="arduinoIp" placeholder="e.g., 192.168.1.100">
+        </div>
+        <div class="form-group">
+            <label for="weatherApiKey">Weather API Key:</label>
+            <input type="text" id="weatherApiKey" placeholder="Your OpenWeatherMap API key" value="f182e088896241bb87c3e81c5e85a640">
+        </div>
+        <button id="saveSettings" class="save-btn">Save Settings</button>
+    </div>
+
+    <script>
+        // DOM elements - Pump controls
+        const statusElement = document.getElementById('status');
+        const onButton = document.getElementById('onButton');
+        const offButton = document.getElementById('offButton');
+        const smartButton = document.getElementById('smartButton');
+        const smartModeStatus = document.getElementById('smartModeStatus');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const errorMessage = document.getElementById('errorMessage');
+        const arduinoIpInput = document.getElementById('arduinoIp');
+        const saveSettingsButton = document.getElementById('saveSettings');
+        
+        // DOM elements - Weather
+        const weatherApiKeyInput = document.getElementById('weatherApiKey');
+        const weatherDisplay = document.getElementById('weatherDisplay');
+        const weatherStatus = document.getElementById('weatherStatus');
+        
+        // DOM elements - Sensor displays
+        const moistureValue = document.getElementById('moistureValue');
+        const moistureFill = document.getElementById('moistureFill');
+        const flowRateValue = document.getElementById('flowRateValue');
+        const flowFill = document.getElementById('flowFill');
+        const totalWaterValue = document.getElementById('totalWaterValue');
+        const systemStatus = document.getElementById('systemStatus');
+        const refreshDataButton = document.getElementById('refreshData');
+        const autoRefreshCheckbox = document.getElementById('autoRefresh');
+        const lastUpdated = document.getElementById('lastUpdated');
+        
+        // DOM elements - Schedule
+        const scheduleIntervalInput = document.getElementById('scheduleInterval');
+        const scheduleDurationInput = document.getElementById('scheduleDuration');
+        const startScheduleButton = document.getElementById('startSchedule');
+        const stopScheduleButton = document.getElementById('stopSchedule');
+        const scheduleStatusText = document.getElementById('scheduleStatus');
+        
+        // Current state
+        let pumpStatus = 'off';
+        let arduinoIp = localStorage.getItem('arduinoIp') || '';
+        let weatherApiKey = localStorage.getItem('weatherApiKey') || 'f182e088896241bb87c3e81c5e85a640';
+        let autoRefreshInterval = null;
+        let schedulingActive = false;
+        let smartModeActive = false;
+        let weatherData = null;
+        let smartModeInterval = null;
+        
+        // Schedule data - simplified to use only the first schedule slot
+        let scheduleData = {
+            enabled: false,
+            schedules: [
+                {
+                    enabled: true,  // Always enable first schedule
+                    interval: 1,    // Default: 1 hour
+                    duration: 5,    // Default: 5 minutes
+                    lastRun: 0
+                },
+                {
+                    enabled: false,
+                    interval: 24,
+                    duration: 10,
+                    lastRun: 0
+                },
+                {
+                    enabled: false,
+                    interval: 48,
+                    duration: 15,
+                    lastRun: 0
+                }
+            ]
+        };
+        
+        // Initialize the UI
+        function init() {
+            // Load saved settings
+            if (arduinoIp) {
+                arduinoIpInput.value = arduinoIp;
+                connectionStatus.textContent = `Arduino IP set to: ${arduinoIp}`;
+                // Get initial data
+                getAllData();
+            }
+            
+            if (weatherApiKey) {
+                weatherApiKeyInput.value = weatherApiKey;
+                getWeatherData();
+            }
+            
+            // Set up event listeners
+            onButton.addEventListener('click', turnPumpOn);
+            offButton.addEventListener('click', turnPumpOff);
+            smartButton.addEventListener('click', toggleSmartMode);
+            saveSettingsButton.addEventListener('click', saveSettings);
+            refreshDataButton.addEventListener('click', getAllData);
+            
+            // Auto-refresh setup
+            autoRefreshCheckbox.addEventListener('change', toggleAutoRefresh);
+            
+            // Schedule controls
+            startScheduleButton.addEventListener('click', startScheduling);
+            stopScheduleButton.addEventListener('click', stopScheduling);
+            
+            // Check if Arduino IP is set, and if so, fetch schedule data
+            if (arduinoIp) {
+                getScheduleData();
+            }
+        }
+        
+        // Toggle auto-refresh
+        function toggleAutoRefresh() {
+            if (autoRefreshCheckbox.checked) {
+                // Start auto-refresh (every 5 seconds)
+                autoRefreshInterval = setInterval(getAllData, 5000);
+            } else {
+                // Stop auto-refresh
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+            }
+        }
+        
+        // Toggle Smart Mode
+        function toggleSmartMode() {
+            if (!weatherData) {
+                weatherStatus.textContent = 'Cannot activate Smart Mode: No weather data';
+                return;
+            }
+            
+            smartModeActive = !smartModeActive;
+            
+            if (smartModeActive) {
+                // Send command to Arduino to enable smart mode
+                fetch(`http://${arduinoIp}/smart/enable`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to enable smart mode');
+                        }
+                        return response.text();
+                    })
+                    .then(() => {
+                        // Update UI
+                        smartModeStatus.textContent = 'Smart Mode: Active';
+                        smartModeStatus.className = 'smart-active';
+                        smartButton.textContent = 'Disable Smart Mode';
+                        
+                        // Disable other controls
+                        onButton.disabled = true;
+                        offButton.disabled = true;
+                        startScheduleButton.disabled = true;
+                        
+                        // Start smart mode logic
+                        getAllData(); // Refresh data
+                    })
+                    .catch(error => {
+                        smartModeActive = false;
+                        smartModeStatus.textContent = `Smart Mode Error: ${error.message}`;
+                        console.error('Smart mode error:', error);
+                    });
+            } else {
+                // Send command to Arduino to disable smart mode
+                fetch(`http://${arduinoIp}/smart/disable`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to disable smart mode');
+                        }
+                        return response.text();
+                    })
+                    .then(() => {
+                        // Update UI
+                        smartModeStatus.textContent = 'Smart Mode: Inactive';
+                        smartModeStatus.className = 'smart-inactive';
+                        smartButton.textContent = 'Smart Mode';
+                        
+                        // Enable other controls
+                        onButton.disabled = false;
+                        offButton.disabled = (pumpStatus === 'on');
+                        startScheduleButton.disabled = false;
+                        
+                        getAllData(); // Refresh data
+                    })
+                    .catch(error => {
+                        smartModeStatus.textContent = `Smart Mode Error: ${error.message}`;
+                        console.error('Smart mode error:', error);
+                    });
+            }
+        }
+        
+        // Get weather forecast data
+        function getWeatherData() {
+            if (!weatherApiKey) {
+                weatherStatus.textContent = 'Weather API key not set';
+                return;
+            }
+            
+            const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=21.588713&lon=39.191943&units=metric&appid=${weatherApiKey}`;
+            
+            weatherStatus.textContent = 'Fetching weather data...';
+            
+            fetch(apiUrl)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Weather API request failed');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    weatherData = data;
+                    displayWeatherData(data);
+                    weatherStatus.textContent = `Weather data for ${data.city.name} loaded successfully`;
+                })
+                .catch(error => {
+                    weatherStatus.textContent = `Error: ${error.message}`;
+                    console.error('Weather API error:', error);
+                });
+        }
+        
+        // Display weather data in the UI
+        function displayWeatherData(data) {
+            // Clear previous weather display
+            weatherDisplay.innerHTML = '';
+            
+            // Get next 6 forecasts (covering next 18 hours as each is 3 hours apart)
+            const forecastsToShow = data.list.slice(0, 6);
+            
+            // Create weather cards
+            forecastsToShow.forEach((forecast, index) => {
+                const date = new Date(forecast.dt * 1000);
+                const temp = forecast.main.temp.toFixed(1);
+                const description = forecast.weather[0].description;
+                const humidity = forecast.main.humidity;
+                const windSpeed = forecast.wind.speed;
+                const rainChance = (forecast.pop * 100).toFixed(0);
+                
+                // Weather icon (simplified with emoji)
+                let weatherIcon = '☀️'; // Default sunny
+                if (forecast.weather[0].main === 'Clouds') {
+                    weatherIcon = '☁️';
+                } else if (forecast.weather[0].main === 'Rain') {
+                    weatherIcon = '🌧️';
+                } else if (forecast.weather[0].main === 'Drizzle') {
+                    weatherIcon = '🌦️';
+                } else if (forecast.weather[0].main === 'Thunderstorm') {
+                    weatherIcon = '⛈️';
+                } else if (forecast.weather[0].main === 'Snow') {
+                    weatherIcon = '❄️';
+                } else if (forecast.weather[0].main === 'Mist' || forecast.weather[0].main === 'Fog') {
+                    weatherIcon = '🌫️';
+                }
+                
+                const card = document.createElement('div');
+                card.className = 'weather-card';
+                
+                // Show day + time for the forecast
+                const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date);
+                const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                card.innerHTML = `
+                    <div class="forecast-day">${index === 0 ? 'Now' : `${dayName} ${timeString}`}</div>
+                    <div class="weather-icon">${weatherIcon}</div>
+                    <div class="weather-value">${temp}°C</div>
+                    <div class="weather-label">${description}</div>
+                    <div class="weather-label">Humidity: ${humidity}%</div>
+                    <div class="weather-label">Wind: ${windSpeed} m/s</div>
+                    <div class="weather-label">Rain: ${rainChance}%</div>
+                `;
+                
+                weatherDisplay.appendChild(card);
+            });
+        }
+        
+        // Save settings
+        function saveSettings() {
+            arduinoIp = arduinoIpInput.value.trim();
+            weatherApiKey = weatherApiKeyInput.value.trim();
+            
+            if (arduinoIp) {
+                localStorage.setItem('arduinoIp', arduinoIp);
+                connectionStatus.textContent = `Arduino IP set to: ${arduinoIp}`;
+                errorMessage.textContent = '';
+                
+                // Check connection by getting all data
+                getAllData();
+                
+                // Also get schedule data
+                getScheduleData();
+            } else {
+                errorMessage.textContent = 'Please enter a valid IP address';
+            }
+            
+            if (weatherApiKey) {
+                localStorage.setItem('weatherApiKey', weatherApiKey);
+                getWeatherData();
+            }
+        }
+        
+        // Update the UI based on pump status
+        function updatePumpUI() {
+            if (pumpStatus === 'on') {
+                statusElement.textContent = 'Pump Status: ON';
+                statusElement.className = 'status on';
+                onButton.disabled = true;
+                offButton.disabled = false;
+            } else {
+                statusElement.textContent = 'Pump Status: OFF';
+                statusElement.className = 'status off';
+                onButton.disabled = false;
+                offButton.disabled = true;
+            }
+        }
+        
+        // Update the last updated timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            lastUpdated.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+        }
+        
+        // Get all sensor data and pump status
+        function getAllData() {
+            if (!arduinoIp) {
+                errorMessage.textContent = 'Please set Arduino IP address first';
+                return;
+            }
+            
+            fetch(`http://${arduinoIp}/data`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to connect to Arduino');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update UI with all data
+                    updateWithData(data);
+                    errorMessage.textContent = '';
+                    connectionStatus.textContent = `Connected to Arduino at ${arduinoIp}`;
+                    systemStatus.textContent = 'Online';
+                    updateTimestamp();
+                    
+                    // Check smart mode status
+                    if (data.smartMode && !smartModeActive) {
+                        smartModeActive = true;
+                        smartModeStatus.textContent = 'Smart Mode: Active';
+                        smartModeStatus.className = 'smart-active';
+                        smartButton.textContent = 'Disable Smart Mode';
+                        onButton.disabled = true;
+                        offButton.disabled = true;
+                        startScheduleButton.disabled = true;
+                    } else if (!data.smartMode && smartModeActive) {
+                        smartModeActive = false;
+                        smartModeStatus.textContent = 'Smart Mode: Inactive';
+                        smartModeStatus.className = 'smart-inactive';
+                        smartButton.textContent = 'Smart Mode';
+                        onButton.disabled = false;
+                        offButton.disabled = (pumpStatus === 'on');
+                        startScheduleButton.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    errorMessage.textContent = `Error: ${error.message}`;
+                    connectionStatus.textContent = 'Failed to connect to Arduino';
+                    systemStatus.textContent = 'Offline';
+                });
+        }
+        
+        // Update UI with data from Arduino
+        function updateWithData(data) {
+            // Update pump status
+            pumpStatus = data.pump;
+            updatePumpUI();
+            
+            // Update moisture
+            const moisture = data.moisture;
+            moistureValue.textContent = `${moisture}%`;
+            moistureFill.style.width = `${moisture}%`;
+            
+            // Update flow rate (max expected is around 6 L/min, scale accordingly)
+            const flowRate = data.flowRate;
+            flowRateValue.textContent = `${flowRate.toFixed(2)} L/min`;
+            const flowPercentage = Math.min(flowRate * 100 / 6, 100); // Scale to max expected
+            flowFill.style.width = `${flowPercentage}%`;
+            
+            // Update total water
+            totalWaterValue.textContent = `${data.totalWater.toFixed(2)} L`;
+        }
+        
+        // Turn pump on
+        function turnPumpOn() {
+            if (!arduinoIp) {
+                errorMessage.textContent = 'Please set Arduino IP address first';
+                return;
+            }
+            
+            sendCommand('on');
+        }
+        
+        // Turn pump off
+        function turnPumpOff() {
+            if (!arduinoIp) {
+                errorMessage.textContent = 'Please set Arduino IP address first';
+                return;
+            }
+            
+            sendCommand('off');
+        }
+        
+        // Send command to Arduino
+        function sendCommand(command) {
+            fetch(`http://${arduinoIp}/${command}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to send command to Arduino');
+                    }
+                    return response.text();
+                })
+                .then(() => {
+                    // Update status after successful command
+                    pumpStatus = command;
+                    updatePumpUI();
+                    errorMessage.textContent = '';
+                    connectionStatus.textContent = `Command sent successfully to ${arduinoIp}`;
+                    // Refresh all data to get the latest readings
+                    getAllData();
+                })
+                .catch(error => {
+                    errorMessage.textContent = `Error: ${error.message}`;
+                });
+        }
+        
+        // Start scheduling
+        function startScheduling() {
+            if (!arduinoIp) {
+                scheduleStatusText.textContent = 'Please set Arduino IP first';
+                return;
+            }
+            
+            // Read current values from inputs
+            const interval = parseInt(scheduleIntervalInput.value);
+            const duration = parseInt(scheduleDurationInput.value);
+            
+            // Validate inputs
+            if (interval < 1 || duration < 1) {
+                scheduleStatusText.textContent = 'Please enter valid interval and duration';
+                return;
+            }
+            
+            // Update schedule data
+            scheduleData.schedules[0].interval = interval;
+            scheduleData.schedules[0].duration = duration;
+            scheduleData.schedules[0].enabled = true;
+            scheduleData.enabled = true;
+            
+            scheduleStatusText.textContent = 'Starting scheduling...';
+            
+            // Send updated schedule to Arduino - stringify the JSON properly
+            const jsonString = JSON.stringify(scheduleData);
+            console.log("Sending schedule data:", jsonString); // Debug output
+            
+            fetch(`http://${arduinoIp}/schedule/update`, {
+                method: 'POST',
+                body: jsonString // Send the raw JSON string
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to save schedule');
+                }
+                return response.text();
+            })
+            .then(() => {
+                // Schedule is saved, now enable it
+                return fetch(`http://${arduinoIp}/schedule/enable`);
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to enable scheduling');
+                }
+                return response.text();
+            })
+            .then(() => {
+                schedulingActive = true;
+                scheduleStatusText.textContent = `Scheduling active: Waters every ${interval} hour(s) for ${duration} minute(s)`;
+                
+                // Update button states
+                startScheduleButton.disabled = true;
+                stopScheduleButton.disabled = false;
+                
+                // Refresh all data
+                getAllData();
+            })
+            .catch(error => {
+                console.error('Error starting scheduling:', error);
+                scheduleStatusText.textContent = 'Error starting scheduling: ' + error.message;
+            });
+        }
+        
+        // Stop scheduling
+        function stopScheduling() {
+            if (!arduinoIp) {
+                scheduleStatusText.textContent = 'Please set Arduino IP first';
+                return;
+            }
+            
+            scheduleStatusText.textContent = 'Stopping scheduling...';
+            
+            // Send command to disable scheduling
+            fetch(`http://${arduinoIp}/schedule/disable`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to disable scheduling');
+                    }
+                    return response.text();
+                })
+                .then(() => {
+                    schedulingActive = false;
+                    scheduleStatusText.textContent = 'Scheduling stopped';
+                    
+                    // Update button states
+                    startScheduleButton.disabled = false;
+                    stopScheduleButton.disabled = true;
+                    
+                    // Refresh all data
+                    getAllData();
+                })
+                .catch(error => {
+                    console.error('Error stopping scheduling:', error);
+                    scheduleStatusText.textContent = 'Error stopping scheduling';
+                });
+        }
+        
+        // Get schedule data from Arduino
+        function getScheduleData() {
+            if (!arduinoIp) {
+                scheduleStatusText.textContent = 'Please set Arduino IP first';
+                return;
+            }
+            
+            fetch(`http://${arduinoIp}/schedule`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to get schedule data');
+                    }
+                    return response.text();
+                })
+                .then(text => {
+                    try {
+                        const data = JSON.parse(text);
+                        
+                        // Update local data
+                        scheduleData = data;
+                        
+                        // Update UI with received data
+                        updateScheduleUI();
+                        
+                        if (data.enabled) {
+                            scheduleStatusText.textContent = `Scheduling active: Waters every ${data.schedules[0].interval} hour(s) for ${data.schedules[0].duration} minute(s)`;
+                            schedulingActive = true;
+                            startScheduleButton.disabled = true;
+                            stopScheduleButton.disabled = false;
+                        } else {
+                            scheduleStatusText.textContent = 'Scheduling not active';
+                            schedulingActive = false;
+                            startScheduleButton.disabled = false;
+                            stopScheduleButton.disabled = true;
+                        }
+                    } catch (parseError) {
+                        throw new Error("Invalid JSON response from Arduino");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching schedule data:', error);
+                    scheduleStatusText.textContent = 'Error loading schedule data';
+                });
+        }
+        
+        // Update the UI with current schedule data
+        function updateScheduleUI() {
+            // Update form fields (using only schedule 1)
+            scheduleIntervalInput.value = scheduleData.schedules[0].interval;
+            scheduleDurationInput.value = scheduleData.schedules[0].duration;
+            
+            // Update button states based on scheduling status
+            startScheduleButton.disabled = scheduleData.enabled;
+            stopScheduleButton.disabled = !scheduleData.enabled;
+        }
+        
+        // Initialize on page load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
